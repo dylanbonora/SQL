@@ -1,0 +1,139 @@
+Exercice 2
+
+Pour avoir les valeurs des attributs qui sont null 
+SELECT * FROM `country` WHERE indepYear is NuLL
+
+1. Liste des continents et des régions du monde. Trier par continent. (25)
+
+ORDER BY permet de trier dans une table
+
+SELECT CONTINENT, REGION 
+FROM COUNTRY ORDER BY continent,region
+
+2. Codes (2 et 3 lettres) et nom de tous les pays d'Amérique du Sud. Trier par nom. (14)
+
+SELECT name,code,continent 
+FROM COUNTRY 
+WHERE Continent like "South America"
+ORDER BY name,code
+
+3. Donnez le nombre de formes de gouvernements présentes dans la base. Quelles sont ces formes ? (35)
+
+SELECT GovernmentForm 
+FROM country 
+ORDER BY GovernmentForm 
+238 ou 239 lignes au total
+
+4. Donnez le nom des villes Françaises de plus de 100 000 habitants. (36)
+
+SELECT name, population 
+FROM CITY 
+WHERE countrycode LIKE "FRA" AND population > 100000 
+
+5. Donnez le nom de toutes les villes d'Europe dont le nom commence par "pa". (11)
+
+SELECT city.name, country.Continent FROM CITY
+JOIN COUNTRY ON  country.code = city.countrycode
+WHERE country.continent = "Europe" AND city.name LIKE "pa%"
+
+6. Donnez le nom des villes d'Europe de plus de 100 000 habitants. (713)
+
+SELECT city.name FROM CITY
+JOIN COUNTRY on country.code = city.countrycode
+WHERE country.continent = "Europe" AND country.population > 100000 
+
+7.Donnez le nombre de pays répertoriés dans la base. (239)
+
+SELECT country.code FROM COUNTRY
+
+8. Donnez tous pays (code et nom) où l'on parle français. (25) Idem pour le chinois, l’anglais et l’arabe.
+(19, 60, 33).
+
+SELECT country.name,countrylanguage.language,country.code
+from countrylanguage
+JOIN country on country.code = countrylanguage.CountryCode
+WHERE language = "French"
+ORDER BY name,code
+
+9. Donnez tous les pays où le français est langue officielle. (18)
+
+SELECT country.name, countrylanguage.language, countrylanguage.isOfficial
+from countrylanguage
+JOIN country on country.code = countrylanguage.countrycode
+WHERE language = "French" and isOfficial = "T"
+ORDER BY name
+
+10. Quels sont les pays où l'on parle français mais pas anglais ? 
+
+SELECT country.name, countrylanguage.language, countrylanguage.isOfficial
+from countrylanguage
+JOIN country on country.code = countrylanguage.countrycode
+WHERE language  = "French" and language !="English"
+
+11. Donnez la surface de l'Europe.
+
+SELECT SUM(country.surfaceArea), country.Continent
+from country
+where country.continent = "Europe"
+
+SELECT country.name, country.continent, country.surfaceArea
+from Country
+WHERE country.continent = "Europe"
+ORDER BY name
+
+12. Quelle est la population moyenne dans les pays d'Asie ?
+
+
+SELECT avg(population),country.continent 
+from country
+Where country.continent = "Asia"
+
+
+13. Quelle est la population moyenne dans les villes des pays d'Asie ?
+
+
+SELECT avg(city.population), country.continent
+from city
+Join Country on country.code = city.countrycode
+Where country.continent = "Asia"
+
+
+14. Donnez le pays asiatique ayant l'espérance de vie la plus courte. Idem pour la plus longue. Afficher code et nom du pays ainsi que l’espérance de vie.
+
+SELECT country.code, country.name, country.continent, min(country.LifeExpectancy)
+from country
+Where country.continent = "ASIA"
+
+SELECT country.code, country.name, country.continent, country.LifeExpectancy
+From country
+WHERE country.LifeExpectancy = (
+		SELECT MIN(LifeExpectancy) FROM LifeExpectancy)
+
+
+SELECT country.code, country.name, country.continent, max(country.LifeExpectancy)
+from country
+Where country.continent = "ASIA"
+ORDER BY country.LifeExpectancy DESC
+
+15. Même question que précédemment mais en ne considérant que les pays de plus de 10 millions d’habitants.
+
+
+SELECT min(country.LifeExpectancy),country.continent, country.code, country.name 
+from country
+Where country.continent = "ASIA" AND country.population > 10000000
+
+SELECT max(country.LifeExpectancy), country.code, country.name, country.continent, 
+from country
+Where country.continent = "ASIA" AND country.population > 10000000
+
+
+16. Quel sont les pays (code et nom) qui parlent au moins trois langues ? (149)
+
+
+SELECT country.code, country.LocalName
+from country
+JOIN country on country.code = countryLanguage.countrycode
+Group by LocalName
+Having count (language)>=3
+
+

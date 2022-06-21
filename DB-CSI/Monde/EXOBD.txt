@@ -1,0 +1,121 @@
+
+
+#Exo_BD_Monde
+
+1)
+select continent, Region from Country order by continent asc
+
+2)select code, Name from Country where Region="South America"
+order by Name asc
+
+3)select count( distinct GovernmentForm) from Country;
+4)
+select Ci.Name from City Ci join Country C ON (Ci.CountryCode = C.Code) WHERE ( C.Name="France" AND Ci.Population > 100000)
+
+5)
+#Donnez le nom de toutes les villes d'Europe dont le nom commence par "pa".
+select Ci.Name from City Ci join Country C ON (Ci.CountryCode = C.Code) where  C.Continent = "Europe" AND Ci.Name like 'Pa%'
+
+6)Donnez le nom des villes d'Europe de plus de 100 000 habitants.
+
+Select Ci.Name from City Ci join Country C on (Ci.CountryCode = C.Code) where( C.Continent= "Europe" AND Ci.Population >=100000)
+
+7)Donnez le nombre de pays répertoriés dans la base.
+
+Select count(LocalName) From Country
+
+8)
+
+Donnez tous pays (code et nom) où l'on parle français.
+
+Select  C.Code, C.LocalName from  Country C join CountryLanguage CL ON CL.CountryCode = C.code where Language="French" 
+
+Select C.Code, C.LocalName from Country C join CountryLanguage CL ON CL.CountryCode = C.code where LANGUAGE="English"
+
+Select C.Code, C.LocalName from Country C join CountryLanguage CL ON CL.CountryCode = C.code where LANGUAGE="Arabic"
+
+Select C.Code, C.LocalName from Country C join CountryLanguage CL ON CL.CountryCode = C.code where LANGUAGE="Arabic"
+
+9)Donnez tous les pays où le français est langue officielle.
+SELECT LocalName from Country C JOIN CountryLanguage CL on C.Code=CL.CountryCode where Language="French" AND IsOfficial="T"
+
+10)Quels sont les pays où l'on parle français mais pas anglais ? 
+Select C.code, C.LocalName, CL.Language from Country C 
+JOIN CountryLanguage CL ON (C.Code = CL.CountryCode) 
+WHERE CL.language = "French" 
+AND C.code not in (Select C.code from Country C 
+JOIN CountryLanguage CL ON (C.Code = CL.CountryCode) 
+WHERE CL.language = "English")
+
+11) Donnez la surface de l'Europe.
+Select SurfaceArea form Country C where Continent ="Europe"
+Select SUM(SurfaceArea) as superficie_europe
+FROM Country 
+where Continent ="Europe"
+
+12) Quelle est la population moyenne dans les pays d'Asie ?
+Select AVG(Population) as Population_moyenne_en_Asie FROM Country where Continent ="Asia"
+
+13) Quelle est la population moyenne dans les villes des pays d'Asie ?
+Select AVG (Ci.Population) From Country C join City Ci ON (Ci.CountryCode = C.Code) Where C.Continent = "Asia"
+
+14) Donnez le pays asiatique ayant l'espérance de vie la plus courte. Idem pour la plus longue.  Afficher code et nom du pays ainsi que l’espérance de vie. 
+Plus Courte:
+SELECT Name FROM Country
+WHERE LifeExpectancy =(SELECT MIN(LifeExpectancy) 
+                         FROM Country 
+                         WHERE Continent = "Asia")
+
+Plus Longue:
+SELECT Name FROM Country
+WHERE LifeExpectancy =(SELECT MAX(LifeExpectancy) 
+                         FROM Country 
+                         WHERE Continent = "Asia")
+
+15) Même question que précédemment mais en ne considérant que les pays de plus de 10 millions d’habitants.
+
+Select LocalName,Population, Code, Min(LifeExpectancy) From Country Where Continent="Asia" AND Population > 10000000
+
+Select LocalName,Population, Code, Max(LifeExpectancy) From Country Where Continent="Asia" AND Population > 10000000
+
+16) Quel sont les pays (code et nom) qui parlent au moins trois langues ? (149)
+
+Select Code,LocalName
+From Country C join CountryLanguage CL 
+ON (C.Code = CL.CountryCode)
+GROUP BY LocalName
+HAVING Count(language)>=3
+
+17) Pays qui parlent au moins trois langues et qui comptent plus d’un million d’habitants ? 
+
+Select Code,LocalName
+From   Country  C  join CountryLanguage CL 
+ON (C.Code = CL.CountryCode)
+WHERE C.Population >=1000000
+GROUP BY LocalName
+HAVING Count(language)>=3
+
+18) Pays qui parlent au moins trois langues et dont le français est langue officielle ? 
+
+Select C.Name
+From   Country  C  join CountryLanguage CL 
+ON (C.Code = CL.CountryCode)
+WHERE EXISTS (SELECT CL2.Language from CountryLanguage  CL2 WHERE CL2.LANGUAGE = 'French' AND CL2.IsOfficial = 'T' and CL2.CountryCode =C.Code )
+GROUP BY LocalName
+HAVING Count(language)>=3
+
+19)Créer dans votre BD1 une vue CountryView comportant pour chaque pays, son code, son nom, le nombre de villes de ce pays et le nombre de langues parlées.
+
+create  VIEW CountryView (Code,Name,CityNumber,LggeNumber)
+
+as
+
+(select c.Code,c.Name,count(distinct cy.ID),count(distinct cl.LANGUAGE)
+
+from Country c join City cy
+
+on c.Code=cy.CountryCode join countrylanguage cl
+
+on c.Code=cl.CountryCode
+
+group by c.Name)
